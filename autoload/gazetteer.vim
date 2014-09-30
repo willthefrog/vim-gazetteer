@@ -50,13 +50,16 @@ function! gazetteer#BuildBufferTagIndex(buf_num)
             let istmpfile = 0
         endif
 
-        let [ags, ft] = ['-f - --fields=ks --excmd=num -u', getbufvar(target_buf_num, "&filetype")]
-        if type(s:types[ft]) == 1
-            let ags .= s:types[ft]
-            let bin = s:bin
-        elseif type(s:types[ft]) == 4
-            let ags = s:types[ft]['args']
-            let bin = expand(s:types[ft]['bin'], 1)
+        let [bin, ags, ft] = [s:bin, '-f - --fields=ks --excmd=num -u', getbufvar(target_buf_num, "&filetype")]
+        if has_key(s:types, ft)
+            if type(s:types[ft]) == 1
+                let ags .= s:types[ft]
+            elseif type(s:types[ft]) == 4
+                let ags = s:types[ft]['args']
+                let bin = expand(s:types[ft]['bin'], 1)
+            endif
+        else
+            let ags .=  " --language-force=" . ft
         endif
 
         let cmdline = bin . ' ' . ags
